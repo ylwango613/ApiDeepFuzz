@@ -13,6 +13,57 @@ const config = {
   apiDir: '/home/fuzz/JavaScriptParser/ApiDeepFuzz/API/'
 };
 
+function getFullExpression(node) {
+  if (!node) return '';
+
+  switch (node.type) {
+    case 'Identifier':
+      return node.name;
+
+    case 'Literal':
+      // 尽量保留源代码表示
+      return node.raw || JSON.stringify(node.value);
+
+    case 'ThisExpression':
+      return 'this';
+
+    case 'MemberExpression': {
+      const objectPart = getFullExpression(node.object);
+      const propertyPart = node.computed
+        ? `[${getFullExpression(node.property)}]`
+        : `.${getFullExpression(node.property)}`;
+      return `${objectPart}${propertyPart}`;
+    }
+
+    case 'UnaryExpression': {
+      const op = node.operator;
+      const arg = getFullExpression(node.argument);
+      return `${op}${arg}`;
+    }
+
+    case 'CallExpression': {
+      const callee = getFullExpression(node.callee);
+      const args = node.arguments.map(arg => getFullExpression(arg)).join(', ');
+      return `${callee}(${args})`;
+    }
+
+    case 'BinaryExpression': {
+      const left = getFullExpression(node.left);
+      const right = getFullExpression(node.right);
+      return `(${left} ${node.operator} ${right})`;
+    }
+
+    case 'UpdateExpression': {
+      const arg = getFullExpression(node.argument);
+      return node.prefix ? `${node.operator}${arg}` : `${arg}${node.operator}`;
+    }
+
+    default:
+      return '[UnsupportedExpression]';
+  }
+}
+
+
 // 提取变量名函数
 function extractVarVariableNames(node, script, result) {
   if (node && node.type === 'VariableDeclaration') {
@@ -27,6 +78,15 @@ function extractVarVariableNames(node, script, result) {
         result.push({ variableName, startlineNumber, endlineNumber, startColNumber, endColNumber, content });
       }
     });
+  }
+    // 支持 AssignmentExpression 的左值
+  if (node && node.type === 'AssignmentExpression') {
+    const variableName = getFullExpression(node.left);
+    const startlineNumber = node.left.loc.start.line;
+    const endlineNumber = node.left.loc.end.line;
+    const startColNumber = node.left.loc.start.column;
+    const endColNumber = node.left.loc.end.column;
+    result.push({ variableName, startlineNumber, endlineNumber, startColNumber, endColNumber, content: "" });
   }
 
   for (const key in node) {
@@ -82,12 +142,11 @@ async function addStringsAfterLines(filePath, lineNumbers, strs, outputPath) {
 
     result.forEach(item => {
       toaddline.push(item.endlineNumber + 1);
-      toaddstring.push(`
-if(flag < maxflag){
-    stdout.write = writeStream.write.bind(writeStream);
-    console.log(Object.prototype.toString.call(${item.variableName}));
-    stdout.write = originalWrite;
-    flag ++;
+      toaddstring.push(`    if(flag < maxflag){
+  stdout.write = writeStream.write.bind(writeStream);
+  console.log(Object.prototype.toString.call(${item.variableName}));
+  stdout.write = originalWrite;
+  flag ++;
 }`);
     });
 
