@@ -4,12 +4,12 @@ const vm = require('vm');
 
 // 定义 config 对象
 const config = {
-  iJSDirectory: '/home/fuzz/JavaScriptParser/DeepFuzz/1.js', // 输入文件目录
-  oJSDirectory: '/home/fuzz/JavaScriptParser/esprima/_2subapi.js', // 输出文件目录
-  objectTypeDiectory: "/home/fuzz/JavaScriptParser/esprima/output.txt", //对象类型输出的文件
-  objectDiectory: "/home/fuzz/JavaScriptParser/esprima/obj.txt", //对象类型输出的文件
-  newSampleDir: "/home/fuzz/JavaScriptParser/esprima/newsample/", //存放编译后js的文件路径
-  apiDir: "/home/fuzz/JavaScriptParser/API/" //存放API文档的路径，API文档名称是对象类型
+  iJSDirectory: '/home/fuzz/JavaScriptParser/ApiDeepFuzz/Data/poc/1.js', // 输入文件目录
+  oJSDirectory: '/home/fuzz/JavaScriptParser/ApiDeepFuzz/Data/pocref/1.js', // 输出文件目录
+  objectTypeDiectory: "/home/fuzz/JavaScriptParser/ApiDeepFuzz/Data/output.txt", //对象类型输出的文件
+  objectDiectory: "/home/fuzz/JavaScriptParser/ApiDeepFuzz/Data/obj.txt", //对象类型输出的文件
+  newSampleDir: "/home/fuzz/JavaScriptParser/ApiDeepFuzz/Data/newsamples/", //存放编译后js的文件路径
+  apiDir: "/home/fuzz/JavaScriptParser/ApiDeepFuzz/API/" //存放API文档的路径，API文档名称是对象类型
 };
 
 

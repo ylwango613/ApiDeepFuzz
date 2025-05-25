@@ -1,0 +1,18 @@
+[
+  {
+    "variableName": "arr",
+    "startlineNumber": 2,
+    "endlineNumber": 2,
+    "startColNumber": 8,
+    "endColNumber": 33,
+    "content": "Uint32Array"
+  },
+  {
+    "variableName": "i",
+    "startlineNumber": 3,
+    "endlineNumber": 3,
+    "startColNumber": 13,
+    "endColNumber": 18,
+    "content": "Number"
+  }
+]
